@@ -279,33 +279,69 @@ export const contentRows: ContentRow[] = [
   },
   {
     id: 'drama',
-    title: 'Drama Series',
-    movies: movies.filter(movie => movie.genre.includes('Drama')).slice(0, 8),
+    title: 'Expo',
+    movies: (() => {
+      const dramaMovies = movies.filter(movie => movie.genre.includes('Drama'));
+      while (dramaMovies.length < 8) {
+        dramaMovies.push(...dramaMovies.slice(0, 8 - dramaMovies.length));
+      }
+      return dramaMovies.slice(0, 8);
+    })(),
   },
   {
     id: 'thriller',
-    title: 'Thrillers',
-    movies: movies.filter(movie => movie.genre.includes('Thriller')).slice(0, 8),
+    title: 'RevenueCat',
+    movies: (() => {
+      const thrillerMovies = movies.filter(movie => movie.genre.includes('Thriller'));
+      while (thrillerMovies.length < 8) {
+        thrillerMovies.push(...thrillerMovies.slice(0, 8 - thrillerMovies.length));
+      }
+      return thrillerMovies.slice(0, 8);
+    })(),
   },
   {
     id: 'scifi',
-    title: 'Sci-Fi & Fantasy',
-    movies: movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy')).slice(0, 8),
+    title: 'Tavus',
+    movies: (() => {
+      const scifiMovies = movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy'));
+      while (scifiMovies.length < 8) {
+        scifiMovies.push(...scifiMovies.slice(0, 8 - scifiMovies.length));
+      }
+      return scifiMovies.slice(0, 8);
+    })(),
   },
   {
     id: 'comedy',
     title: 'Comedy Shows',
-    movies: movies.filter(movie => movie.genre.includes('Comedy')).slice(0, 8),
+    movies: (() => {
+      const comedyMovies = movies.filter(movie => movie.genre.includes('Comedy'));
+      while (comedyMovies.length < 8) {
+        comedyMovies.push(...comedyMovies.slice(0, 8 - comedyMovies.length));
+      }
+      return comedyMovies.slice(0, 8);
+    })(),
   },
   {
     id: 'crime',
     title: 'Crime & Mystery',
-    movies: movies.filter(movie => movie.genre.includes('Crime') || movie.genre.includes('Mystery')).slice(0, 8),
+    movies: (() => {
+      const crimeMovies = movies.filter(movie => movie.genre.includes('Crime') || movie.genre.includes('Mystery'));
+      while (crimeMovies.length < 8) {
+        crimeMovies.push(...crimeMovies.slice(0, 8 - crimeMovies.length));
+      }
+      return crimeMovies.slice(0, 8);
+    })(),
   },
   {
     id: 'action',
     title: 'Action & Adventure',
-    movies: movies.filter(movie => movie.genre.includes('Action') || movie.genre.includes('Adventure')).slice(0, 8),
+    movies: (() => {
+      const actionMovies = movies.filter(movie => movie.genre.includes('Action') || movie.genre.includes('Adventure'));
+      while (actionMovies.length < 8) {
+        actionMovies.push(...actionMovies.slice(0, 8 - actionMovies.length));
+      }
+      return actionMovies.slice(0, 8);
+    })(),
   },
 ];
 

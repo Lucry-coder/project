@@ -180,7 +180,7 @@ function App() {
             {finalContentRows.map((row) => (
               <div
                 key={row.id}
-                id={row.id === 'mylist' ? 'mylist-section' : undefined}
+                id={row.id === 'mylist' ? 'mylist-section' : `${row.id}-section`}
                 className={row.id === 'mylist' ? 'pt-16' : ''}
               >
                 <ContentRow

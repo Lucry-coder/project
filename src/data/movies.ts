@@ -303,25 +303,11 @@ export const contentRows: ContentRow[] = [
     id: 'scifi',
     title: 'Tavus',
     movies: (() => {
-      const scifiMovies = movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy')).slice(0, 8);
-      
-      // Update with custom images
-      const customImages = [
-        '/src/assets/1.jpg',  // Box 1
-        '/src/assets/2.jpg',  // Box 2
-        '/src/assets/3.jpg',  // Box 3
-        '/src/assets/4.jpg',  // Box 4
-        '/src/assets/5.jpg',  // Box 5
-        '/src/assets/1.jpg',  // Box 6 (reuse image 1)
-        '/src/assets/2.jpg',  // Box 7 (reuse image 2)
-        '/src/assets/3.jpg',  // Box 8 (reuse image 3)
-      ];
-      
-      return scifiMovies.map((movie, index) => ({
-        ...movie,
-        thumbnail: customImages[index] || movie.thumbnail,
-        backdrop: customImages[index] || movie.backdrop,
-      }));
+      const scifiMovies = movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy'));
+      while (scifiMovies.length < 8) {
+        scifiMovies.push(...scifiMovies.slice(0, 8 - scifiMovies.length));
+      }
+      return scifiMovies.slice(0, 8);
     })(),
   },
   {

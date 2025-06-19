@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Play, Plus, ThumbsUp, Heart } from 'lucide-react';
 import { Movie } from '../types';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface MovieModalProps {
   movie: Movie;
@@ -23,23 +22,6 @@ export const MovieModal: React.FC<MovieModalProps> = ({
   isLiked,
 }) => {
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
-  const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
-  
-  // Stato locale per controllo immediato del pulsante
-  const [isInMyList, setIsInMyList] = useState(false);
-
-  // Sincronizza lo stato locale con il localStorage all'inizializzazione
-  useEffect(() => {
-    setIsInMyList(myList.includes(movie.id));
-  }, [movie.id, myList]);
-
-  const toggleMyList = () => {
-    // 1. Aggiorna IMMEDIATAMENTE lo stato locale per feedback visivo istantaneo
-    setIsInMyList(prev => !prev);
-    
-    // 2. Poi chiama la funzione parent per aggiornare il localStorage
-    onAddToList(movie);
-  };
 
   return (
     <div 
@@ -101,24 +83,11 @@ export const MovieModal: React.FC<MovieModalProps> = ({
               </button>
 
               <button
-                onClick={toggleMyList}
-                className={`flex items-center justify-center space-x-3 px-6 py-3 rounded-md font-semibold backdrop-blur-sm transition-all duration-300 transform hover:scale-105 ${
-                  isInMyList 
-                    ? 'bg-red-600 text-white hover:bg-red-700' 
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
+                onClick={() => onAddToList(movie)}
+                className="flex items-center justify-center space-x-3 bg-gray-600/80 text-white px-6 py-3 rounded-md hover:bg-gray-600 transition-colors font-semibold backdrop-blur-sm"
               >
-                {isInMyList ? (
-                  <>
-                    <span className="text-xl">✓</span>
-                    <span>Rimuovi dalla mia lista</span>
-                  </>
-                ) : (
-                  <>
-                    <Plus size={20} />
-                    <span>Aggiungi alla mia lista</span>
-                  </>
-                )}
+                <Plus size={20} />
+                <span>My List</span>
               </button>
             </div>
           </div>

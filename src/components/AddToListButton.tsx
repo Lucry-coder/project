@@ -28,19 +28,22 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Aggiorna immediatamente lo stato locale per feedback visivo istantaneo
-    const newState = !isInList;
-    setIsInList(newState);
-    
-    // Aggiorna il localStorage
-    if (newState) {
-      setMyList(prev => [...prev, movieId]);
-    } else {
-      setMyList(prev => prev.filter(id => id !== movieId));
-    }
-    
-    // Chiama callback opzionale
-    onAddToList?.(movieId);
+    // ✅ Usa la versione funzionale per aggiornamento immediato
+    setIsInList(prev => {
+      const newState = !prev;
+      
+      // Aggiorna il localStorage basandosi sul nuovo stato
+      if (newState) {
+        setMyList(prevList => [...prevList, movieId]);
+      } else {
+        setMyList(prevList => prevList.filter(id => id !== movieId));
+      }
+      
+      // Chiama callback opzionale
+      onAddToList?.(movieId);
+      
+      return newState;
+    });
   };
 
   const getSizeClasses = () => {
@@ -65,6 +68,17 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
     }
   };
 
+  const getTextSize = () => {
+    switch (size) {
+      case 'sm':
+        return 'text-xs';
+      case 'lg':
+        return 'text-base';
+      default:
+        return 'text-sm';
+    }
+  };
+
   return (
     <button
       onClick={handleClick}
@@ -75,23 +89,26 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
         duration-300 
         transform 
         hover:scale-110
+        flex items-center justify-center
         ${isInList 
-          ? 'bg-red-600 text-white hover:bg-red-700' 
-          : 'bg-gray-700/80 text-white hover:bg-green-500'
+          ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-500/25' 
+          : 'bg-green-600 text-white hover:bg-green-700 shadow-green-500/25'
         }
+        shadow-lg hover:shadow-xl
         ${className}
       `}
       title={isInList ? 'Remove from My List' : 'Add to My List'}
+      aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
     >
-      <div className="flex items-center space-x-2">
+      <div className={`flex items-center ${showText ? 'space-x-2' : ''}`}>
         {isInList ? (
           <X size={getIconSize()} />
         ) : (
           <Plus size={getIconSize()} />
         )}
         {showText && (
-          <span className="text-sm font-medium">
-            {isInList ? 'Remove' : 'Add'}
+          <span className={`font-medium ${getTextSize()}`}>
+            {isInList ? 'My List' : 'My List'}
           </span>
         )}
       </div>

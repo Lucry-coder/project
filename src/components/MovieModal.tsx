@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Play, Plus, ThumbsUp, Heart } from 'lucide-react';
 import { Movie } from '../types';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface MovieModalProps {
   movie: Movie;
@@ -22,6 +23,13 @@ export const MovieModal: React.FC<MovieModalProps> = ({
   isLiked,
 }) => {
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
+  const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
+  const isInMyList = myList.includes(movie.id);
+
+  const handleAddToList = () => {
+    onAddToList(movie);
+    // Il componente si ri-renderizzerà automaticamente perché myList cambierà
+  };
 
   return (
     <div 
@@ -83,11 +91,15 @@ export const MovieModal: React.FC<MovieModalProps> = ({
               </button>
 
               <button
-                onClick={() => onAddToList(movie)}
-                className="flex items-center justify-center space-x-3 bg-gray-600/80 text-white px-6 py-3 rounded-md hover:bg-gray-600 transition-colors font-semibold backdrop-blur-sm"
+                onClick={handleAddToList}
+                className={`flex items-center justify-center space-x-3 px-6 py-3 rounded-md font-semibold backdrop-blur-sm transition-all duration-300 ${
+                  isInMyList 
+                    ? 'bg-red-600/80 text-white hover:bg-red-600 hover:scale-105' 
+                    : 'bg-gray-600/80 text-white hover:bg-green-500 hover:scale-105'
+                }`}
               >
-                <Plus size={20} />
-                <span>My List</span>
+                <Plus size={20} className={`transition-transform duration-300 ${isInMyList ? 'rotate-45' : ''}`} />
+                <span>{isInMyList ? 'Rimuovi dalla mia lista' : 'Aggiungi alla mia lista'}</span>
               </button>
             </div>
           </div>

@@ -28,19 +28,22 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Aggiorna immediatamente lo stato locale per feedback visivo istantaneo
-    const newState = !isInList;
-    setIsInList(newState);
-    
-    // Aggiorna il localStorage
-    if (newState) {
-      setMyList(prev => [...prev, movieId]);
-    } else {
-      setMyList(prev => prev.filter(id => id !== movieId));
-    }
-    
-    // Chiama callback opzionale
-    onAddToList?.(movieId);
+    // ✅ SOLUZIONE: Usa funzione di aggiornamento per garantire il valore corretto
+    setIsInList(prev => {
+      const newState = !prev; // Ora "prev" è sempre il valore più aggiornato
+      
+      // Aggiorna il localStorage basandoti sul nuovo stato
+      if (newState) {
+        setMyList(prevList => [...prevList, movieId]);
+      } else {
+        setMyList(prevList => prevList.filter(id => id !== movieId));
+      }
+      
+      // Chiama callback opzionale
+      onAddToList?.(movieId);
+      
+      return newState;
+    });
   };
 
   const getSizeClasses = () => {
@@ -82,6 +85,7 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
         ${className}
       `}
       title={isInList ? 'Remove from My List' : 'Add to My List'}
+      aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
     >
       <div className="flex items-center space-x-2">
         {isInList ? (

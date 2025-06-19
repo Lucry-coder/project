@@ -81,37 +81,39 @@ export const ContentRow: React.FC<ContentRowProps> = ({
             return (
               <div
                 key={movie.id}
-                className="relative flex-shrink-0 w-48 md:w-64 cursor-pointer transition-all duration-300 ease-out hover:scale-125 hover:z-30"
+                className="relative flex-shrink-0 w-48 md:w-64 cursor-pointer"
                 onMouseEnter={() => setHoveredMovie(movie.id)}
                 onMouseLeave={() => setHoveredMovie(null)}
                 onClick={() => onMoreInfo(movie)}
               >
-                <div className="relative overflow-hidden rounded-md transition-all duration-300 hover:shadow-2xl hover:shadow-black/50">
+                <div className={`relative overflow-hidden rounded-md transition-all duration-300 ${
+                  hoveredMovie === movie.id ? 'scale-105 z-20' : 'scale-100'
+                }`}>
                   <img
                     src={movie.thumbnail}
                     alt={movie.title}
-                    className="w-full h-36 md:h-48 object-cover transition-transform duration-300"
+                    className="w-full h-36 md:h-48 object-cover"
                   />
                   
                   <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 ${
                     hoveredMovie === movie.id ? 'opacity-100' : 'opacity-0'
                   }`} />
                   
-                  <div className={`absolute bottom-0 left-0 right-0 p-3 md:p-4 transition-all duration-300 ${
+                  <div className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 ${
                     hoveredMovie === movie.id 
                       ? 'translate-y-0 opacity-100' 
                       : 'translate-y-4 opacity-0'
                   }`}>
-                    <h3 className="text-white font-semibold text-xs md:text-sm mb-2 line-clamp-2">
+                    <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
                       {movie.title}
                     </h3>
                     
-                    <div className="flex items-center space-x-1 md:space-x-2 mb-2 md:mb-3">
-                      <span className="text-green-500 text-xs font-semibold bg-green-500/20 px-1 rounded">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className="text-green-500 text-xs font-semibold">
                         {movie.rating}
                       </span>
                       <span className="text-white/70 text-xs">{movie.year}</span>
-                      <span className="text-white/70 text-xs hidden md:inline">{movie.duration}</span>
+                      <span className="text-white/70 text-xs">{movie.duration}</span>
                       {movie.likes && (
                         <div className="flex items-center space-x-1">
                           <span className="text-red-500 text-xs">❤</span>
@@ -120,15 +122,15 @@ export const ContentRow: React.FC<ContentRowProps> = ({
                       )}
                     </div>
                     
-                    <div className="flex space-x-1 md:space-x-2">
+                    <div className="flex space-x-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onPlay(movie);
                         }}
-                        className="bg-white text-black p-1.5 md:p-2 rounded-full hover:bg-white/90 transition-all duration-200 hover:scale-110"
+                        className="bg-white text-black p-2 rounded-full hover:bg-white/90 transition-colors"
                       >
-                        <Play size={14} className="md:w-4 md:h-4" fill="currentColor" />
+                        <Play size={16} fill="currentColor" />
                       </button>
                       <button
                         onClick={(e) => {
@@ -137,16 +139,16 @@ export const ContentRow: React.FC<ContentRowProps> = ({
                         }}
                         className={`p-2 rounded-full transition-colors ${
                           isMyListRow 
-                            ? 'bg-red-600/80 text-white hover:bg-red-600 hover:scale-110' 
+                            ? 'bg-red-600/80 text-white hover:bg-red-600' 
                             : isInMyList
-                              ? 'bg-gray-700/80 text-white hover:bg-red-500 hover:scale-110'
-                              : 'bg-gray-700/80 text-white hover:bg-green-500 hover:scale-110'
-                        } transition-all duration-200 p-1.5 md:p-2`}
+                              ? 'bg-gray-700/80 text-white hover:bg-red-500'
+                              : 'bg-gray-700/80 text-white hover:bg-green-500'
+                        }`}
                       >
                         {isMyListRow ? (
-                          <X size={14} className="md:w-4 md:h-4" />
+                          <X size={16} />
                         ) : (
-                          <Plus size={14} className="md:w-4 md:h-4" />
+                          <Plus size={16} />
                         )}
                       </button>
                       <button
@@ -154,9 +156,9 @@ export const ContentRow: React.FC<ContentRowProps> = ({
                           e.stopPropagation();
                           onMoreInfo(movie);
                         }}
-                        className="bg-gray-700/80 text-white p-1.5 md:p-2 rounded-full hover:bg-gray-700 transition-all duration-200 hover:scale-110"
+                        className="bg-gray-700/80 text-white p-2 rounded-full hover:bg-gray-700 transition-colors"
                       >
-                        <Info size={14} className="md:w-4 md:h-4" />
+                        <Info size={16} />
                       </button>
                     </div>
                   </div>

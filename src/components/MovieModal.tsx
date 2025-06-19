@@ -7,6 +7,7 @@ interface MovieModalProps {
   movie: Movie;
   onClose: () => void;
   onPlay: (movie: Movie) => void;
+  onAddToList: (movie: Movie) => void;
   onLike: (movie: Movie) => void;
   currentLikes: number;
   isLiked: boolean;

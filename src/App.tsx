@@ -5,24 +5,24 @@ import { ContentRow } from './components/ContentRow';
 import { VideoPlayer } from './components/VideoPlayer';
 import { MovieModal } from './components/MovieModal';
 import { SearchResults } from './components/SearchResults';
-import { AuthModal } from './components/AuthModal';
-import { featuredMovie, contentRows, movies } from './data/movies';
-import { useAuth } from './hooks/useAuth';
-import { useMyList } from './hooks/useMyList';
+import { ProfileDropdown } from './components/ProfileDropdown';
+import { NotificationDropdown } from './components/NotificationDropdown';
+import { featuredMovie, contentRows, movies, getMostLikedMovies } from './data/movies';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import { Movie } from './types';
 
 function App() {
-  const { user, loading: authLoading } = useAuth();
-  const { myList } = useMyList();
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [myList, setMyList] = useLocalStorage<string[]>('netflix-mylist', []);
   const [searchSuggestions, setSearchSuggestions] = useState<Movie[]>([]);
-  const [movieLikes, setMovieLikes] = useState<Record<string, number>>({});
-  const [userLikes, setUserLikes] = useState<string[]>([]);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [movieLikes, setMovieLikes] = useLocalStorage<Record<string, number>>('netflix-likes', {});
+  const [userLikes, setUserLikes] = useLocalStorage<string[]>('netflix-user-likes', []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,14 +57,38 @@ function App() {
     setCurrentMovie(movie);
   };
 
+  const handleAddToList = (movie: Movie) => {
+    setMyList(prev => 
+      prev.includes(movie.id) 
+        ? prev.filter(id => id !== movie.id)
+        : [...prev, movie.id]
+    );
+  };
+
   const handleMoreInfo = (movie: Movie) => {
     setSelectedMovie(movie);
+  };
+
+  const handleSignOut = () => {
+    setShowProfileDropdown(false);
+    // In a real app, this would clear auth tokens and redirect to login
+    console.log('Signing out...');
   };
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSearchQuery('');
     setSearchResults([]);
+  };
+
+  const handleNotificationClick = () => {
+    setShowNotificationDropdown(!showNotificationDropdown);
+    setShowProfileDropdown(false);
+  };
+
+  const handleProfileClick = () => {
+    setShowProfileDropdown(!showProfileDropdown);
+    setShowNotificationDropdown(false);
   };
 
   const handleLike = (movie: Movie) => {
@@ -107,29 +131,32 @@ function App() {
     };
   });
 
-  // Create My List section if user has items
   const myListMovies = movies.filter(movie => myList.includes(movie.id));
-  const finalContentRows = user && myListMovies.length > 0 
+  const finalContentRows = myListMovies.length > 0 
     ? [{ id: 'mylist', title: 'My List', movies: myListMovies }, ...updatedContentRows]
     : updatedContentRows;
-
-  if (authLoading) {
-    return (
-      <div className="bg-black min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-black min-h-screen">
       <Header
         onSearch={handleSearch}
+        onProfileClick={handleProfileClick}
+        onNotificationClick={handleNotificationClick}
         onLogoClick={handleLogoClick}
         isScrolled={isScrolled}
         searchSuggestions={searchSuggestions}
         onMovieSelect={handleMovieSelect}
-        onShowAuth={() => setShowAuthModal(true)}
+      />
+
+      <ProfileDropdown
+        isOpen={showProfileDropdown}
+        onClose={() => setShowProfileDropdown(false)}
+        onSignOut={handleSignOut}
+      />
+
+      <NotificationDropdown
+        isOpen={showNotificationDropdown}
+        onClose={() => setShowNotificationDropdown(false)}
       />
 
       {searchQuery ? (
@@ -137,7 +164,7 @@ function App() {
           query={searchQuery}
           results={searchResults}
           onPlay={handlePlay}
-          onAddToList={() => {}} // Handled by AddToListButton
+          onAddToList={handleAddToList}
           onMoreInfo={handleMoreInfo}
         />
       ) : (
@@ -145,6 +172,7 @@ function App() {
           <Hero
             movie={featuredMovie}
             onPlay={handlePlay}
+            onAddToList={handleAddToList}
             onMoreInfo={handleMoreInfo}
           />
 
@@ -159,6 +187,7 @@ function App() {
                   title={row.title}
                   movies={row.movies}
                   onPlay={handlePlay}
+                  onAddToList={handleAddToList}
                   onMoreInfo={handleMoreInfo}
                   isMyListRow={row.id === 'mylist'}
                 />
@@ -180,17 +209,12 @@ function App() {
           movie={selectedMovie}
           onClose={() => setSelectedMovie(null)}
           onPlay={handlePlay}
-          onAddToList={() => {}} // Handled by AddToListButton
+          onAddToList={handleAddToList}
           onLike={handleLike}
           currentLikes={movieLikes[selectedMovie.id] || selectedMovie.likes || 0}
           isLiked={userLikes.includes(selectedMovie.id)}
         />
       )}
-
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
     </div>
   );
 }

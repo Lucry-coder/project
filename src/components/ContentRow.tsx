@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Play, Plus, Info, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Info } from 'lucide-react';
 import { Movie } from '../types';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { AddToListButton } from './AddToListButton';
 
 interface ContentRowProps {
   title: string;
@@ -24,7 +24,6 @@ export const ContentRow: React.FC<ContentRowProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [hoveredMovie, setHoveredMovie] = useState<string | null>(null);
-  const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
@@ -76,8 +75,6 @@ export const ContentRow: React.FC<ContentRowProps> = ({
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {movies.map((movie) => {
-            const isInMyList = myList.includes(movie.id);
-            
             return (
               <div
                 key={movie.id}
@@ -132,25 +129,13 @@ export const ContentRow: React.FC<ContentRowProps> = ({
                       >
                         <Play size={16} fill="currentColor" />
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAddToList(movie);
-                        }}
-                        className={`p-2 rounded-full transition-colors ${
-                          isMyListRow 
-                            ? 'bg-red-600/80 text-white hover:bg-red-600' 
-                            : isInMyList
-                              ? 'bg-gray-700/80 text-white hover:bg-red-500'
-                              : 'bg-gray-700/80 text-white hover:bg-green-500'
-                        }`}
-                      >
-                        {isMyListRow ? (
-                          <X size={16} />
-                        ) : (
-                          <Plus size={16} />
-                        )}
-                      </button>
+                      
+                      <AddToListButton
+                        movieId={movie.id}
+                        onAddToList={() => onAddToList(movie)}
+                        size="sm"
+                      />
+                      
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

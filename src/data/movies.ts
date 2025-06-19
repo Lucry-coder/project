@@ -280,32 +280,32 @@ export const contentRows: ContentRow[] = [
   {
     id: 'drama',
     title: 'Drama Series',
-    movies: movies.filter(movie => movie.genre.includes('Drama')),
+    movies: movies.filter(movie => movie.genre.includes('Drama')).slice(0, 8),
   },
   {
     id: 'thriller',
     title: 'Thrillers',
-    movies: movies.filter(movie => movie.genre.includes('Thriller')),
+    movies: movies.filter(movie => movie.genre.includes('Thriller')).slice(0, 8),
   },
   {
     id: 'scifi',
     title: 'Sci-Fi & Fantasy',
-    movies: movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy')),
+    movies: movies.filter(movie => movie.genre.includes('Sci-Fi') || movie.genre.includes('Fantasy')).slice(0, 8),
   },
   {
     id: 'comedy',
     title: 'Comedy Shows',
-    movies: movies.filter(movie => movie.genre.includes('Comedy')),
+    movies: movies.filter(movie => movie.genre.includes('Comedy')).slice(0, 8),
   },
   {
     id: 'crime',
     title: 'Crime & Mystery',
-    movies: movies.filter(movie => movie.genre.includes('Crime') || movie.genre.includes('Mystery')),
+    movies: movies.filter(movie => movie.genre.includes('Crime') || movie.genre.includes('Mystery')).slice(0, 8),
   },
   {
     id: 'action',
     title: 'Action & Adventure',
-    movies: movies.filter(movie => movie.genre.includes('Action') || movie.genre.includes('Adventure')),
+    movies: movies.filter(movie => movie.genre.includes('Action') || movie.genre.includes('Adventure')).slice(0, 8),
   },
 ];
 

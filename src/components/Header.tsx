@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Bell, ChevronDown, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Bell, ChevronDown, User, LogOut } from 'lucide-react';
 import { Movie } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
-  onProfileClick: () => void;
-  onNotificationClick: () => void;
   onLogoClick: () => void;
   isScrolled: boolean;
   searchSuggestions?: Movie[];
   onMovieSelect?: (movie: Movie) => void;
+  onShowAuth: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   onSearch, 
-  onProfileClick, 
-  onNotificationClick,
   onLogoClick,
   isScrolled,
   searchSuggestions = [],
-  onMovieSelect
+  onMovieSelect,
+  onShowAuth
 }) => {
+  const { user, signOut } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +64,11 @@ export const Header: React.FC<HeaderProps> = ({
         block: 'start'
       });
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setShowProfileDropdown(false);
   };
 
   const navItems = [
@@ -159,23 +165,52 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          <button 
-            onClick={onNotificationClick}
-            className="text-white hover:text-gray-300 transition-colors p-2 relative"
-          >
-            <Bell size={20} />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full"></div>
-          </button>
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors"
+              >
+                <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                  <User size={16} />
+                </div>
+                <ChevronDown size={16} />
+              </button>
 
-          <button
-            onClick={onProfileClick}
-            className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors"
-          >
-            <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-              <User size={16} />
+              {showProfileDropdown && (
+                <div className="absolute top-full right-0 mt-2 bg-black/90 backdrop-blur-md border border-gray-700 rounded-md shadow-xl min-w-48">
+                  <div className="p-2">
+                    <div className="flex items-center space-x-3 p-3 border-b border-gray-700">
+                      <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                        <User size={16} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">{user.email}</p>
+                        <p className="text-white/60 text-xs">Premium Member</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-700 pt-2">
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center space-x-3 w-full text-left p-2 text-white hover:bg-gray-700/50 rounded transition-colors"
+                      >
+                        <LogOut size={16} />
+                        <span className="text-sm">Sign out</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <ChevronDown size={16} />
-          </button>
+          ) : (
+            <button
+              onClick={onShowAuth}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </header>

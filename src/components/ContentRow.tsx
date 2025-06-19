@@ -7,7 +7,6 @@ interface ContentRowProps {
   title: string;
   movies: Movie[];
   onPlay: (movie: Movie) => void;
-  onAddToList: (movie: Movie) => void;
   onMoreInfo: (movie: Movie) => void;
   isMyListRow?: boolean;
 }
@@ -16,7 +15,6 @@ export const ContentRow: React.FC<ContentRowProps> = ({
   title,
   movies,
   onPlay,
-  onAddToList,
   onMoreInfo,
   isMyListRow = false,
 }) => {
@@ -44,6 +42,8 @@ export const ContentRow: React.FC<ContentRowProps> = ({
     setCanScrollLeft(scrollLeft > 0);
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
   };
+
+  if (movies.length === 0) return null;
 
   return (
     <div className="px-4 md:px-8 mb-8">
@@ -74,83 +74,80 @@ export const ContentRow: React.FC<ContentRowProps> = ({
           className="flex space-x-4 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {movies.map((movie) => {
-            return (
-              <div
-                key={movie.id}
-                className="relative flex-shrink-0 w-48 md:w-64 cursor-pointer"
-                onMouseEnter={() => setHoveredMovie(movie.id)}
-                onMouseLeave={() => setHoveredMovie(null)}
-                onClick={() => onMoreInfo(movie)}
-              >
-                <div className={`relative overflow-hidden rounded-md transition-all duration-300 ${
-                  hoveredMovie === movie.id ? 'scale-105 z-20' : 'scale-100'
+          {movies.map((movie) => (
+            <div
+              key={movie.id}
+              className="relative flex-shrink-0 w-48 md:w-64 cursor-pointer"
+              onMouseEnter={() => setHoveredMovie(movie.id)}
+              onMouseLeave={() => setHoveredMovie(null)}
+              onClick={() => onMoreInfo(movie)}
+            >
+              <div className={`relative overflow-hidden rounded-md transition-all duration-300 ${
+                hoveredMovie === movie.id ? 'scale-105 z-20' : 'scale-100'
+              }`}>
+                <img
+                  src={movie.thumbnail}
+                  alt={movie.title}
+                  className="w-full h-36 md:h-48 object-cover"
+                />
+                
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 ${
+                  hoveredMovie === movie.id ? 'opacity-100' : 'opacity-0'
+                }`} />
+                
+                <div className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 ${
+                  hoveredMovie === movie.id 
+                    ? 'translate-y-0 opacity-100' 
+                    : 'translate-y-4 opacity-0'
                 }`}>
-                  <img
-                    src={movie.thumbnail}
-                    alt={movie.title}
-                    className="w-full h-36 md:h-48 object-cover"
-                  />
+                  <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
+                    {movie.title}
+                  </h3>
                   
-                  <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 ${
-                    hoveredMovie === movie.id ? 'opacity-100' : 'opacity-0'
-                  }`} />
+                  <div className="flex items-center space-x-2 mb-3">
+                    <span className="text-green-500 text-xs font-semibold">
+                      {movie.rating}
+                    </span>
+                    <span className="text-white/70 text-xs">{movie.year}</span>
+                    <span className="text-white/70 text-xs">{movie.duration}</span>
+                    {movie.likes && (
+                      <div className="flex items-center space-x-1">
+                        <span className="text-red-500 text-xs">❤</span>
+                        <span className="text-white/70 text-xs">{movie.likes}</span>
+                      </div>
+                    )}
+                  </div>
                   
-                  <div className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 ${
-                    hoveredMovie === movie.id 
-                      ? 'translate-y-0 opacity-100' 
-                      : 'translate-y-4 opacity-0'
-                  }`}>
-                    <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
-                      {movie.title}
-                    </h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPlay(movie);
+                      }}
+                      className="bg-white text-black p-2 rounded-full hover:bg-white/90 transition-colors"
+                    >
+                      <Play size={16} fill="currentColor" />
+                    </button>
                     
-                    <div className="flex items-center space-x-2 mb-3">
-                      <span className="text-green-500 text-xs font-semibold">
-                        {movie.rating}
-                      </span>
-                      <span className="text-white/70 text-xs">{movie.year}</span>
-                      <span className="text-white/70 text-xs">{movie.duration}</span>
-                      {movie.likes && (
-                        <div className="flex items-center space-x-1">
-                          <span className="text-red-500 text-xs">❤</span>
-                          <span className="text-white/70 text-xs">{movie.likes}</span>
-                        </div>
-                      )}
-                    </div>
+                    <AddToListButton
+                      movieId={movie.id}
+                      size="sm"
+                    />
                     
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPlay(movie);
-                        }}
-                        className="bg-white text-black p-2 rounded-full hover:bg-white/90 transition-colors"
-                      >
-                        <Play size={16} fill="currentColor" />
-                      </button>
-                      
-                      <AddToListButton
-                        movieId={movie.id}
-                        onAddToList={() => onAddToList(movie)}
-                        size="sm"
-                      />
-                      
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onMoreInfo(movie);
-                        }}
-                        className="bg-gray-700/80 text-white p-2 rounded-full hover:bg-gray-700 transition-colors"
-                      >
-                        <Info size={16} />
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoreInfo(movie);
+                      }}
+                      className="bg-gray-700/80 text-white p-2 rounded-full hover:bg-gray-700 transition-colors"
+                    >
+                      <Info size={16} />
+                    </button>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

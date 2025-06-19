@@ -1,19 +1,15 @@
 import React from 'react';
-import { Play, Plus, Info } from 'lucide-react';
+import { Play, Info } from 'lucide-react';
 import { Movie } from '../types';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { AddToListButton } from './AddToListButton';
 
 interface HeroProps {
   movie: Movie;
   onPlay: (movie: Movie) => void;
-  onAddToList: (movie: Movie) => void;
   onMoreInfo: (movie: Movie) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ movie, onPlay, onAddToList, onMoreInfo }) => {
-  const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
-  const isInMyList = myList.includes(movie.id);
-
+export const Hero: React.FC<HeroProps> = ({ movie, onPlay, onMoreInfo }) => {
   return (
     <div className="relative h-screen flex items-center">
       <div
@@ -55,17 +51,11 @@ export const Hero: React.FC<HeroProps> = ({ movie, onPlay, onAddToList, onMoreIn
             <span>Play</span>
           </button>
 
-          <button
-            onClick={() => onAddToList(movie)}
-            className={`flex items-center justify-center space-x-3 bg-gray-500/70 text-white px-8 py-3 rounded-md font-semibold backdrop-blur-sm transition-colors ${
-              isInMyList 
-                ? 'hover:bg-red-500/90' 
-                : 'hover:bg-green-500/90'
-            }`}
-          >
-            <Plus size={24} />
-            <span>My List</span>
-          </button>
+          <AddToListButton
+            movieId={movie.id}
+            variant="hero"
+            className="rounded-md"
+          />
 
           <button
             onClick={() => onMoreInfo(movie)}

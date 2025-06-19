@@ -1,49 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { Plus, X, Heart } from 'lucide-react';
+import { useMyList } from '../hooks/useMyList';
+import { useAuth } from '../hooks/useAuth';
 
 interface AddToListButtonProps {
   movieId: string;
-  onAddToList?: (movieId: string) => void;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
+  variant?: 'default' | 'hero';
 }
 
 export const AddToListButton: React.FC<AddToListButtonProps> = ({
   movieId,
-  onAddToList,
   className = '',
   size = 'md',
   showText = false,
+  variant = 'default',
 }) => {
-  const [myList, setMyList] = useLocalStorage<string[]>('netflix-mylist', []);
-  const [isInList, setIsInList] = useState(myList.includes(movieId));
+  const { user } = useAuth();
+  const { isInList, toggleInList } = useMyList();
+  const [isToggling, setIsToggling] = useState(false);
+  const [localState, setLocalState] = useState(false);
 
-  // Sincronizza lo stato locale quando myList cambia
+  // Initialize local state
   useEffect(() => {
-    setIsInList(myList.includes(movieId));
-  }, [myList, movieId]);
+    setLocalState(isInList(movieId));
+  }, [movieId, isInList]);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Aggiorna immediatamente lo stato locale per feedback visivo istantaneo
-    const newState = !isInList;
-    setIsInList(newState);
-    
-    // Aggiorna il localStorage
-    if (newState) {
-      setMyList(prev => [...prev, movieId]);
-    } else {
-      setMyList(prev => prev.filter(id => id !== movieId));
+    if (!user) {
+      // Handle unauthenticated user - could show auth modal
+      return;
     }
+
+    if (isToggling) return;
+
+    setIsToggling(true);
     
-    // Chiama callback opzionale
-    onAddToList?.(movieId);
+    // Immediate UI feedback
+    setLocalState(prev => !prev);
+    
+    try {
+      await toggleInList(movieId);
+    } catch (error) {
+      // Revert on error
+      setLocalState(prev => !prev);
+      console.error('Error toggling list:', error);
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const getSizeClasses = () => {
+    if (variant === 'hero') {
+      return 'px-8 py-3';
+    }
+    
     switch (size) {
       case 'sm':
         return 'p-1.5';
@@ -55,6 +70,8 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
   };
 
   const getIconSize = () => {
+    if (variant === 'hero') return 24;
+    
     switch (size) {
       case 'sm':
         return 14;
@@ -65,33 +82,65 @@ export const AddToListButton: React.FC<AddToListButtonProps> = ({
     }
   };
 
+  const getButtonClasses = () => {
+    if (variant === 'hero') {
+      return `
+        flex items-center justify-center space-x-3 
+        font-semibold backdrop-blur-sm transition-all duration-300
+        ${localState 
+          ? 'bg-red-600/80 text-white hover:bg-red-600 hover:scale-105' 
+          : 'bg-gray-500/70 text-white hover:bg-green-500/90 hover:scale-105'
+        }
+      `;
+    }
+
+    return `
+      rounded-full transition-all duration-300 transform hover:scale-110
+      ${localState 
+        ? 'bg-red-600 text-white hover:bg-red-700' 
+        : 'bg-gray-700/80 text-white hover:bg-green-500'
+      }
+    `;
+  };
+
+  const getIcon = () => {
+    if (variant === 'hero') {
+      return localState ? <Heart size={getIconSize()} fill="currentColor" /> : <Plus size={getIconSize()} />;
+    }
+    return localState ? <X size={getIconSize()} /> : <Plus size={getIconSize()} />;
+  };
+
+  const getText = () => {
+    if (variant === 'hero') {
+      return localState ? 'My List' : 'My List';
+    }
+    return localState ? 'Remove' : 'Add';
+  };
+
   return (
     <button
       onClick={handleClick}
+      disabled={isToggling || !user}
       className={`
         ${getSizeClasses()}
-        rounded-full 
-        transition-all 
-        duration-300 
-        transform 
-        hover:scale-110
-        ${isInList 
-          ? 'bg-red-600 text-white hover:bg-red-700' 
-          : 'bg-gray-700/80 text-white hover:bg-green-500'
-        }
+        ${getButtonClasses()}
+        ${variant === 'hero' ? 'rounded-md' : ''}
+        ${!user ? 'opacity-50 cursor-not-allowed' : ''}
         ${className}
       `}
-      title={isInList ? 'Remove from My List' : 'Add to My List'}
+      title={
+        !user 
+          ? 'Sign in to add to your list'
+          : localState 
+            ? 'Remove from My List' 
+            : 'Add to My List'
+      }
     >
-      <div className="flex items-center space-x-2">
-        {isInList ? (
-          <X size={getIconSize()} />
-        ) : (
-          <Plus size={getIconSize()} />
-        )}
-        {showText && (
+      <div className={`flex items-center ${showText || variant === 'hero' ? 'space-x-2' : ''}`}>
+        {getIcon()}
+        {(showText || variant === 'hero') && (
           <span className="text-sm font-medium">
-            {isInList ? 'Remove' : 'Add'}
+            {getText()}
           </span>
         )}
       </div>

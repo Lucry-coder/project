@@ -55,24 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const handleSectionClick = (sectionId: string) => {
-    const element = document.getElementById(`${sectionId}-section`);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  };
-
-  const navItems = [
-    { name: 'Home', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-    { name: 'Expo', action: () => handleSectionClick('drama') },
-    { name: 'RevenueCat', action: () => handleSectionClick('thriller') },
-    { name: 'Tavus', action: () => handleSectionClick('scifi') },
-    { name: 'New & Popular', action: () => handleSectionClick('trending') },
-    { name: 'My List', action: handleMyListClick }
-  ];
+  const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List'];
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -89,13 +72,13 @@ export const Header: React.FC<HeaderProps> = ({
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item, index) => (
               <button
-                key={item.name}
-                onClick={item.action}
+                key={item}
+                onClick={item === 'My List' ? handleMyListClick : undefined}
                 className={`text-white hover:text-gray-300 transition-colors text-sm ${
                   index === 0 ? 'font-semibold' : ''
                 }`}
               >
-                {item.name}
+                {item}
               </button>
             ))}
           </nav>

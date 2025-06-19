@@ -25,14 +25,14 @@ export const MovieModal: React.FC<MovieModalProps> = ({
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
   const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
   
-  // Stato locale per il controllo immediato del pulsante (seguendo il tuo pattern)
+  // Stato locale per il controllo immediato del pulsante
   const [isInMyList, setIsInMyList] = useState(myList.includes(movie.id));
 
-  const toggleMyList = () => {
-    // Aggiorna immediatamente lo stato locale (come nel tuo esempio)
-    setIsInMyList(prev => !prev);
+  const handleAddToList = () => {
+    // Aggiorna immediatamente lo stato locale
+    setIsInMyList(!isInMyList);
     
-    // Chiama la funzione parent per sincronizzare con localStorage
+    // Chiama la funzione parent per aggiornare il localStorage
     onAddToList(movie);
   };
 
@@ -95,18 +95,15 @@ export const MovieModal: React.FC<MovieModalProps> = ({
                 <span>Play</span>
               </button>
 
-              {/* Pulsante MyList migliorato seguendo il tuo pattern */}
               <button
-                onClick={toggleMyList}
-                className={`flex items-center justify-center space-x-3 px-6 py-3 rounded-md font-semibold backdrop-blur-sm transition-all duration-300 transform hover:scale-105 ${
+                onClick={handleAddToList}
+                className={`flex items-center justify-center space-x-3 px-6 py-3 rounded-md font-semibold backdrop-blur-sm transition-all duration-300 ${
                   isInMyList 
-                    ? 'bg-red-600 hover:bg-red-700 text-white' 
-                    : 'bg-gray-600 hover:bg-green-600 text-white'
+                    ? 'bg-red-600/80 text-white hover:bg-red-600 hover:scale-105' 
+                    : 'bg-gray-600/80 text-white hover:bg-green-500 hover:scale-105'
                 }`}
               >
-                <span className="text-xl transition-transform duration-300">
-                  {isInMyList ? '✓' : '+'}
-                </span>
+                <Plus size={20} className={`transition-transform duration-300 ${isInMyList ? 'rotate-45' : ''}`} />
                 <span>{isInMyList ? 'Rimuovi dalla mia lista' : 'Aggiungi alla mia lista'}</span>
               </button>
             </div>

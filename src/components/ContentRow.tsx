@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Play, Info } from 'lucide-react';
 import { Movie } from '../types';
 import { AddToListButton } from './AddToListButton';
+import { MovieImage } from './MovieImage';
 
 interface ContentRowProps {
   title: string;
@@ -86,7 +87,8 @@ export const ContentRow: React.FC<ContentRowProps> = ({
                 <div className={`relative overflow-hidden rounded-md transition-all duration-300 ${
                   hoveredMovie === movie.id ? 'scale-105 z-20' : 'scale-100'
                 }`}>
-                  <img
+                  {/* ✅ Usa MovieImage con gestione errori automatica */}
+                  <MovieImage
                     src={movie.thumbnail}
                     alt={movie.title}
                     className="w-full h-36 md:h-48 object-cover"

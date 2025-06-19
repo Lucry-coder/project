@@ -24,11 +24,16 @@ export const MovieModal: React.FC<MovieModalProps> = ({
 }) => {
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
   const [myList] = useLocalStorage<string[]>('netflix-mylist', []);
-  const isInMyList = myList.includes(movie.id);
+  
+  // Stato locale per il controllo immediato del pulsante
+  const [isInMyList, setIsInMyList] = useState(myList.includes(movie.id));
 
   const handleAddToList = () => {
+    // Aggiorna immediatamente lo stato locale
+    setIsInMyList(!isInMyList);
+    
+    // Chiama la funzione parent per aggiornare il localStorage
     onAddToList(movie);
-    // Il componente si ri-renderizzerà automaticamente perché myList cambierà
   };
 
   return (

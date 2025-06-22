@@ -235,6 +235,15 @@ function App() {
                 id={row.id === 'mylist' ? 'mylist-section' : `${row.id}-section`}
                 className={row.id === 'mylist' ? 'pt-16' : ''}
               >
+                {/* Titolo della sezione con anchor per la navigazione */}
+                <div className="px-4 md:px-8 pt-8 pb-4">
+                  <h2 className="text-white text-3xl md:text-4xl font-bold mb-2 flex items-center">
+                    <span className="w-1 h-8 bg-red-600 mr-4 rounded-full"></span>
+                    {row.title}
+                  </h2>
+                  <div className="w-20 h-1 bg-red-600 rounded-full ml-6"></div>
+                </div>
+                
                 <ContentRow
                   title={row.title}
                   movies={row.movies}

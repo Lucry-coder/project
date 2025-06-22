@@ -7,11 +7,15 @@ import { MovieModal } from './components/MovieModal';
 import { SearchResults } from './components/SearchResults';
 import { ProfileDropdown } from './components/ProfileDropdown';
 import { NotificationDropdown } from './components/NotificationDropdown';
+import { LoginScreen } from './components/LoginScreen';
+import { SettingsScreen } from './components/SettingsScreen';
 import { featuredMovie, contentRows, movies, getMostLikedMovies } from './data/movies';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useAuth } from './hooks/useAuth';
 import { Movie } from './types';
 
 function App() {
+  const { user, isAuthenticated, login, logout, switchUser, updateUser } = useAuth();
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +23,8 @@ function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [showLoginScreen, setShowLoginScreen] = useState(false);
+  const [showSettingsScreen, setShowSettingsScreen] = useState(false);
   const [myList, setMyList] = useLocalStorage<string[]>('netflix-mylist', []);
   const [searchSuggestions, setSearchSuggestions] = useState<Movie[]>([]);
   const [movieLikes, setMovieLikes] = useLocalStorage<Record<string, number>>('netflix-likes', {});
@@ -32,6 +38,19 @@ function App() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Se non autenticato, mostra la schermata di login
+  if (!isAuthenticated || showLoginScreen) {
+    return (
+      <LoginScreen
+        onLogin={(email, password) => {
+          login(email, password);
+          setShowLoginScreen(false);
+        }}
+        onClose={() => setShowLoginScreen(false)}
+      />
+    );
+  }
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -71,8 +90,17 @@ function App() {
 
   const handleSignOut = () => {
     setShowProfileDropdown(false);
-    // In a real app, this would clear auth tokens and redirect to login
-    console.log('Signing out...');
+    logout();
+  };
+
+  const handleSwitchUser = () => {
+    setShowProfileDropdown(false);
+    setShowLoginScreen(true);
+  };
+
+  const handleOpenSettings = () => {
+    setShowProfileDropdown(false);
+    setShowSettingsScreen(true);
   };
 
   const handleLogoClick = () => {
@@ -146,17 +174,28 @@ function App() {
         isScrolled={isScrolled}
         searchSuggestions={searchSuggestions}
         onMovieSelect={handleMovieSelect}
+        user={user}
       />
 
       <ProfileDropdown
         isOpen={showProfileDropdown}
         onClose={() => setShowProfileDropdown(false)}
         onSignOut={handleSignOut}
+        onSwitchUser={handleSwitchUser}
+        onOpenSettings={handleOpenSettings}
+        user={user}
       />
 
       <NotificationDropdown
         isOpen={showNotificationDropdown}
         onClose={() => setShowNotificationDropdown(false)}
+      />
+
+      <SettingsScreen
+        isOpen={showSettingsScreen}
+        onClose={() => setShowSettingsScreen(false)}
+        user={user}
+        onUpdateUser={updateUser}
       />
 
       {searchQuery ? (

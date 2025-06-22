@@ -7,6 +7,7 @@ interface ProfileDropdownProps {
   onSignOut: () => void;
   onSwitchUser: () => void;
   onOpenSettings: () => void;
+  onOpenHelp: () => void;
   user?: {
     name: string;
     email: string;
@@ -20,6 +21,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   onSignOut,
   onSwitchUser,
   onOpenSettings,
+  onOpenHelp,
   user,
 }) => {
   if (!isOpen) return null;
@@ -75,7 +77,13 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <span className="text-sm">Account Settings</span>
             </button>
             
-            <button className="flex items-center space-x-3 w-full text-left p-2 text-white hover:bg-gray-700/50 rounded transition-colors">
+            <button 
+              onClick={() => {
+                onOpenHelp();
+                onClose();
+              }}
+              className="flex items-center space-x-3 w-full text-left p-2 text-white hover:bg-gray-700/50 rounded transition-colors"
+            >
               <HelpCircle size={16} />
               <span className="text-sm">Help Center</span>
             </button>

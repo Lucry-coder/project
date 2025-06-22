@@ -9,6 +9,7 @@ import { ProfileDropdown } from './components/ProfileDropdown';
 import { NotificationDropdown } from './components/NotificationDropdown';
 import { LoginScreen } from './components/LoginScreen';
 import { SettingsScreen } from './components/SettingsScreen';
+import { HelpCenter } from './components/HelpCenter';
 import { featuredMovie, contentRows, movies, getMostLikedMovies } from './data/movies';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAuth } from './hooks/useAuth';
@@ -25,6 +26,7 @@ function App() {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showLoginScreen, setShowLoginScreen] = useState(false);
   const [showSettingsScreen, setShowSettingsScreen] = useState(false);
+  const [showHelpCenter, setShowHelpCenter] = useState(false);
   const [myList, setMyList] = useLocalStorage<string[]>('netflix-mylist', []);
   const [searchSuggestions, setSearchSuggestions] = useState<Movie[]>([]);
   const [movieLikes, setMovieLikes] = useLocalStorage<Record<string, number>>('netflix-likes', {});
@@ -101,6 +103,11 @@ function App() {
   const handleOpenSettings = () => {
     setShowProfileDropdown(false);
     setShowSettingsScreen(true);
+  };
+
+  const handleOpenHelp = () => {
+    setShowProfileDropdown(false);
+    setShowHelpCenter(true);
   };
 
   const handleLogoClick = () => {
@@ -183,6 +190,7 @@ function App() {
         onSignOut={handleSignOut}
         onSwitchUser={handleSwitchUser}
         onOpenSettings={handleOpenSettings}
+        onOpenHelp={handleOpenHelp}
         user={user}
       />
 
@@ -196,6 +204,11 @@ function App() {
         onClose={() => setShowSettingsScreen(false)}
         user={user}
         onUpdateUser={updateUser}
+      />
+
+      <HelpCenter
+        isOpen={showHelpCenter}
+        onClose={() => setShowHelpCenter(false)}
       />
 
       {searchQuery ? (
